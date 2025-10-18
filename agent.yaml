@@ -1,0 +1,70 @@
+
+from PyPDF2 import PdfReader, PdfWriter
+
+# ----- Tool 1: Read PDF -----
+class ReadPdfTool:
+    def run(self, file_path):
+        """Read and print text from a PDF."""
+        reader = PdfReader(file_path)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        return text[:1000]  # show first 500 chars
+
+
+# ----- Tool 2: Split PDF -----
+class SplitPdfTool:
+    def run(self, file_path, pages_per_file=1):
+        """Split PDF into smaller files."""
+        reader = PdfReader(file_path)
+        total_pages = len(reader.pages)
+        file_list = []
+        part = 1
+
+        for i in range(0, total_pages, pages_per_file):
+            writer = PdfWriter()
+            for j in range(i, min(i + pages_per_file, total_pages)):
+                writer.add_page(reader.pages[j])
+
+            out_name = f"output_part_{part}.pdf"
+            with open(out_name, "wb") as f:
+                writer.write(f)
+            file_list.append(out_name)
+            part += 1
+
+        return file_list
+
+
+# ----- Agent that uses both tools -----
+class PdfAgent:
+    def __init__(self):
+        self.reader = ReadPdfTool()
+        self.splitter = SplitPdfTool()
+
+    def read_pdf(self, file_path):
+        return self.reader.run(file_path)
+
+    def split_pdf(self, file_path, pages_per_file=1):
+        return self.splitter.run(file_path, pages_per_file)
+
+
+# ----- Main program -----
+if __name__ == "__main__":
+    agent = PdfAgent()
+
+    print("Choose option:\n1. Read PDF\n2. Split PDF")
+    choice = input("Enter 1 or 2: ")
+    path = input("Enter PDF file path: ")
+
+    if choice == "1":
+        text = agent.read_pdf(path)
+        print("\n--- Extracted Text (first 500 chars) ---")
+        print(text)
+    elif choice == "2":
+        n = int(input("How many pages per file? "))
+        files = agent.split_pdf(path, n)
+        print("\n--- Files created ---")
+        for f in files:
+            print(f)
+    else:
+        print("Invalid option.")
