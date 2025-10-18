@@ -9,10 +9,9 @@ class ReadPdfTool:
         text = ""
         for page in reader.pages:
             text += page.extract_text() or ""
-        return text[:700]  # show first 700 chars
+        return text[:2000]  # show first 2000 chars
 
 
-# ----- Tool 2: Split PDF -----
 class SplitPdfTool:
     def run(self, file_path, pages_per_file=1):
         """Split PDF into smaller files."""
@@ -58,7 +57,7 @@ if __name__ == "__main__":
 
     if choice == "1":
         text = agent.read_pdf(path)
-        print("\n--- Extracted Text (first 500 chars) ---")
+        print("\n--- Extracted Text (first 2000 chars) ---")
         print(text)
     elif choice == "2":
         n = int(input("How many pages per file? "))
